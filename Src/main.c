@@ -167,6 +167,8 @@ int main(void)
 			HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 0xFFFF);
 
 			for (UINT it=0; it<items_sz; it++){
+				snprintf(buffer, sizeof(buffer), "dir %x\n", items[it].dir);
+				HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 0xFFFF);
 				FRESULT res = read_filename(path, items[it], buffer);
 				if (res != FR_OK) continue;
 				HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 0xFFFF);
@@ -373,23 +375,27 @@ FRESULT scan_files (char* path, DIR* items, UINT *items_sz)        /* Start node
 
 	res = f_opendir(&dir, path);                       /* Open the directory */
 	if (res == FR_OK) {
+		items[*items_sz]=dir;
+		(*items_sz)++;
 		for (;;) {
 			res = f_readdir(&dir, &fno);                   /* Read a directory item */
 
 			if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
-			if (fno.fattrib & AM_DIR) {                    /* It is a directory */
-				i = strlen(path);
-				sprintf(&path[i], "/%s", fno.fname);
-				res = scan_files(path, items, items_sz);     /* Enter the directory */
-				if (res != FR_OK) break;
-				path[i] = 0;
-			} else {                                       /* It is a file. */
+//			if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+//				i = strlen(path);
+//				sprintf(&path[i], "/%s", fno.fname);
+//				res = scan_files(path, items, items_sz);     /* Enter the directory */
+//				if (res != FR_OK) break;
+//				path[i] = 0;
+//			} else
+			{                                       /* It is a file. */
 				snprintf(buffer, sizeof(buffer), "%s/%s\n", path, fno.fname);
 				HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 0xFFFF);
 				if (*items_sz>255) break;
-				items[(*items_sz)++]=dir;
-				snprintf(buffer, sizeof(buffer), "DIR.dir pointer %x\n", dir.dir);
+				items[*items_sz]=dir;
+				snprintf(buffer, sizeof(buffer), "DIR.dir pointer %x %x\n", dir.dir, items[*items_sz].dir);
 				HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 0xFFFF);
+				(*items_sz)++;
 			}
 		}
 		f_closedir(&dir);
