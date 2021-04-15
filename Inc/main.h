@@ -83,7 +83,7 @@ void Error_Handler(void);
 #define NUCLEO_SPIx_MISO_GPIO_Port GPIOA
 #define NUCLEO_SPIx_MOSI_Pin GPIO_PIN_7
 #define NUCLEO_SPIx_MOSI_GPIO_Port GPIOA
-#define SD_CS_Pin GPIO_PIN_9
+#define SD_CS_Pin GPIO_PIN_10
 #define SD_CS_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
